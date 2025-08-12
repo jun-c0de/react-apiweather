@@ -1,32 +1,67 @@
-import React, { useReducer } from 'react'
-
+import React, { useState, useReducer } from 'react'
+import './TodoList.css'
 const reducer = (state, action) => {
     switch (action.type) {
-        case "increment":
-            return { count: state.count + 1 }
-        case "decrement":
-            return { count: state.count - 1 }
-        case "reset":
-            return {count:0}
+        case "add":
+            return [
+                ...state, {
+                    id: Date.now(),
+                    text: action.text,
+                    completed: false
+                }
+            ]
+        case "toggle":
+            return state.map((todo)=>
+            todo.id==action.id?{
+                ...todo,
+                completed:!todo.completed
+            }:todo)
+        case "delete":
+        return state.filter((todo)=>todo.id !== action.id)
         default:
-            throw new Error("오류 코드")
+            return 
     }
-
 }
 
-const Counter = () => {
-    const initailState = { count: 0 }
 
-    const [state, dispatch] = useReducer(reducer, initailState)
+const TodoList = () => {
+    const [todos, dispatch] = useReducer(reducer, [])
+    const [text, setText] = useState('')
+
+    const handleAdd = () => {
+        if (!text.trim()) return
+        dispatch({ type: "add", text })
+        setText('')
+    }
 
     return (
         <div>
-            <p>Count : {state.count}</p>
-            <button onClick={() => dispatch({ type: "decrement" })}>-</button>
-            <button onClick={() => dispatch({ type: "reset" })}>reset</button>
-            <button onClick={() => dispatch({ type: "increment" })}>+</button>
+            <h2>todolist</h2>
+            <input
+                value={text}
+                onChange={(e) => setText(e.target.value)}
+                onKeyUp={(e) => {
+                    if (e.key === 'Enter') handleAdd()
+                }}
+
+                type="text" placeholder='할일을 추가하세요' />
+            <button onClick={handleAdd}>추가</button>
+            <ul className='list'>
+                {todos.map((todo) => (
+                    <li key={todo.id}>
+                        <span 
+                        onClick={()=>dispatch({type:"toggle",id:todo.id})}
+
+                        className={todo.completed ? 'completed' : ''}>
+                        {todo.text}
+                        </span>
+                        <button onClick={()=>dispatch({type:'delete',id:todo.id})}>삭제</button>
+                    </li>
+                ))}
+
+            </ul>
         </div>
     )
 }
 
-export default Counter
+export default TodoList
