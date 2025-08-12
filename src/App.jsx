@@ -51,7 +51,7 @@ function App() {
 
   return (
     <div className='app'>
-      <h1>***의 날씨앱</h1>
+      <h1>성준의 날씨앱</h1>
       <div className="input-wrap">
         <input
           ref={inputRef}
